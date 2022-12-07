@@ -1,0 +1,12 @@
+create sequence hibernate_sequence start with 1 increment by 1;
+create table privilege (id bigint not null, name varchar(255), primary key (id));
+create table role (id bigint not null, name varchar(255), primary key (id));
+create table roles_privileges (role_id bigint not null, privilege_id bigint not null);
+create table user (id bigint not null, email varchar(255), password varchar(255), primary key (id));
+create table users_roles (user_id bigint not null, role_id bigint not null);
+alter table roles_privileges add constraint privilege_id foreign key (privilege_id) references privilege(id);
+alter table roles_privileges add constraint role_id foreign key (role_id) references role(id);
+alter table users_roles add constraint role_id_FK foreign key (role_id) references role(id);
+alter table users_roles add constraint user_id foreign key (user_id) references user(id);
+CREATE TABLE hibernate_sequence ( next_val BIGINT );
+INSERT INTO hibernate_sequence (next_val) VALUES (0);
