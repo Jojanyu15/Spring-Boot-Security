@@ -13,13 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
+    public static final String VIEW_INFO = "VIEW_INFO";
+    public static final String VIEW_ADMIN = "VIEW_ADMIN";
     boolean alreadySetup = false;
     @Autowired
     private UserRepository userRepository;
@@ -37,29 +37,20 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-       /* if (alreadySetup) {
+        if (alreadySetup) {
             return;
         }
-        Privilege viewInfoPrivilege = createPrivilegeIfNotFound("VIEW_INFO");
-        Privilege viewAdminPrivilege = createPrivilegeIfNotFound("VIEW_ADMIN");
-        List<Privilege> godPrivileges = Arrays.asList(viewInfoPrivilege, viewAdminPrivilege);
-        createRoleIfNotFound("GOD", godPrivileges);
-        createRoleIfNotFound("ADMIN", Collections.singletonList(viewAdminPrivilege));
-        createRoleIfNotFound("USER", Collections.singletonList(viewInfoPrivilege));
-
-        Role godRoles = roleRepository.findByName("GOD");
-        Role userRole = roleRepository.findByName("USER");
-        Role adminRole = roleRepository.findByName("ADMIN");
-
-
-        User godUser = new User("god@test.com", passwordEncoder.encode("test"), true,Collections.singletonList(godRoles));
-        User adminUser = new User("admin@test.com", passwordEncoder.encode("test"), true,Collections.singletonList(adminRole));
-        User normalUser = new User("user@test.com", passwordEncoder.encode("test"),true, Collections.singletonList(userRole));
-        System.out.println(normalUser);
+        Privilege viewInfoPrivilege = createPrivilegeIfNotFound(VIEW_INFO);
+        Privilege viewAdminPrivilege = createPrivilegeIfNotFound(VIEW_ADMIN);
+        createRoleIfNotFound(VIEW_ADMIN, Collections.singletonList(viewAdminPrivilege));
+        createRoleIfNotFound(VIEW_INFO, Collections.singletonList(viewInfoPrivilege));
+        Role userRole = roleRepository.findByName(VIEW_INFO);
+        Role adminRole = roleRepository.findByName(VIEW_ADMIN);
+        User adminUser = new User("admin@test.com", passwordEncoder.encode("test"), true, 0, Collections.singletonList(adminRole));
+        User normalUser = new User("user@test.com", passwordEncoder.encode("test"), true, 0, Collections.singletonList(userRole));
         userRepository.save(normalUser);
-        userRepository.save(godUser);
         userRepository.save(adminUser);
-        alreadySetup = true;*/
+        alreadySetup = true;
     }
 
     @Transactional
@@ -73,15 +64,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     @Transactional
-    public Role createRoleIfNotFound(
-            String name, Collection<Privilege> privileges) {
-
+    public void createRoleIfNotFound(String name, Collection<Privilege> privileges) {
         Role role = roleRepository.findByName(name);
         if (role == null) {
             role = new Role(name);
             role.setPrivileges(privileges);
             roleRepository.save(role);
         }
-        return role;
     }
 }

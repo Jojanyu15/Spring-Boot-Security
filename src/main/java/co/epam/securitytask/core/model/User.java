@@ -6,9 +6,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Date;
 
 @Entity
 @Table(name = "user")
@@ -18,22 +18,9 @@ public class User implements UserDetails {
     private Long id;
     private String email;
     private String password;
-    private boolean enabled;
-
-    public User(String email, String password, boolean enabled, Collection<Role> roles) {
-        this.email = email;
-        this.password = password;
-        this.enabled = enabled;
-        this.roles = roles;
-    }
-
-    public User() {
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
+    private boolean isNonLocked;
+    private int loginRetries;
+    private Date lastFailureLoginDate;
     @ManyToMany
     @JoinTable(
             name = "users_roles",
@@ -42,6 +29,36 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles;
+
+
+
+    public User(String email, String password, boolean isNonLocked, Collection<Role> roles) {
+        this.email = email;
+        this.password = password;
+        this.isNonLocked = isNonLocked;
+        this.roles = roles;
+    }
+
+    public User(String email, String password, boolean isNonLocked, int loginRetries, Collection<Role> roles) {
+        this.email = email;
+        this.password = password;
+        this.isNonLocked = isNonLocked;
+        this.loginRetries = loginRetries;
+        this.roles = roles;
+    }
+
+    public User() {
+    }
+    public Date getLastFailureLoginDate() {
+        return lastFailureLoginDate;
+    }
+
+    public void setLastFailureLoginDate(Date lastLogin) {
+        this.lastFailureLoginDate = lastLogin;
+    }
+    public void setIsNonLocked(boolean locked) {
+        this.isNonLocked = locked;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -80,7 +97,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return isNonLocked;
     }
 
     @Override
@@ -103,6 +120,14 @@ public class User implements UserDetails {
 
     public void setRoles(Collection<Role> roles) {
         this.roles = roles;
+    }
+
+    public int getLoginRetries() {
+        return loginRetries;
+    }
+
+    public void setLoginRetries(int loginRetries) {
+        this.loginRetries = loginRetries;
     }
 
     @Override
