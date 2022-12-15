@@ -9,20 +9,14 @@ import org.springframework.security.authentication.event.AuthenticationFailureBa
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.security.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
-import java.util.TimeZone;
 
 @Component
-public class CustomAuthenticationFailureHandler implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
-    private final Logger LOGGER = LoggerFactory.getLogger(CustomAuthenticationFailureHandler.class);
+public class CustomAuthenticationFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
+    private final Logger LOGGER = LoggerFactory.getLogger(CustomAuthenticationFailureListener.class);
     private final UserRepository userRepository;
 
-    public CustomAuthenticationFailureHandler(UserRepository userRepository) {
+    public CustomAuthenticationFailureListener(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

@@ -13,13 +13,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 @Component
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
-    public static final String VIEW_INFO = "VIEW_INFO";
-    public static final String VIEW_ADMIN = "VIEW_ADMIN";
+    public static final String VIEW_INFO = "ROLE_VIEW_INFO";
+    public static final String VIEW_ADMIN = "ROLE_VIEW_ADMIN";
     boolean alreadySetup = false;
     @Autowired
     private UserRepository userRepository;
@@ -37,16 +38,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (alreadySetup) {
-            return;
-        }
         Privilege viewInfoPrivilege = createPrivilegeIfNotFound(VIEW_INFO);
         Privilege viewAdminPrivilege = createPrivilegeIfNotFound(VIEW_ADMIN);
         createRoleIfNotFound(VIEW_ADMIN, Collections.singletonList(viewAdminPrivilege));
         createRoleIfNotFound(VIEW_INFO, Collections.singletonList(viewInfoPrivilege));
         Role userRole = roleRepository.findByName(VIEW_INFO);
         Role adminRole = roleRepository.findByName(VIEW_ADMIN);
-        User adminUser = new User("admin@test.com", passwordEncoder.encode("test"), true, 0, Collections.singletonList(adminRole));
+        User adminUser = new User("admin@test.com", passwordEncoder.encode("test"), true, 0,Arrays.asList(userRole,adminRole));
         User normalUser = new User("user@test.com", passwordEncoder.encode("test"), true, 0, Collections.singletonList(userRole));
         userRepository.save(normalUser);
         userRepository.save(adminUser);

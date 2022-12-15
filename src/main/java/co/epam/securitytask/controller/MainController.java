@@ -1,7 +1,10 @@
 package co.epam.securitytask.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Scanner;
 
 @Controller
 public class MainController {
@@ -31,8 +34,8 @@ public class MainController {
         return "admin";
     }
 
-    @RequestMapping("/403.html")
+   /* @RequestMapping("/403.html")
     public String forbidden() {
         return "403";
-    }
+    }*/
 }

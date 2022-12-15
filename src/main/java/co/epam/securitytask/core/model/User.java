@@ -21,7 +21,7 @@ public class User implements UserDetails {
     private boolean isNonLocked;
     private int loginRetries;
     private Date lastFailureLoginDate;
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(
